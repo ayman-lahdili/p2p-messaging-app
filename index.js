@@ -20,6 +20,7 @@ if (exists) {
     console.log('loading data');
     data = JSON.parse(fs.readFileSync('data.json', 'utf8'));
     // Parse it  back to object
+    
   } else {
     // Otherwise start with blank list
     console.log('No words');
