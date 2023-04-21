@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/222cea3eed.js"></script>
+    <script src="forge.min.js"> </script>
+    <title>Document</title>
+</head>
+<body>        
+    </div>
+    <div class="sidebar">
+        <div class="sidebar__top">
+            <!-- <input type="text" placeholder="Find or start a conversation" /> -->
+        </div>
+
+        <div class="sidebar__users">
+            <div class="sidebar__usersHeader">
+                <div class="sidebar__header">
+                    <h4>Direct messages</h4>
+                </div>
+                <i class="fas fa-plus sidebar__addUser"></i>
+            </div>
+            <div class="contacts">
+                <div class="contact" style="display:none">
+                    <div class="sidebar__user">
+                        <div>
+                        <span class="status"></span>
+                        </div>
+                        <h4>Dummy</h4>
+                    </div>
+                    <i class="fas fa-trash-alt sidebar__deleteUser"></i>
+                </div>
+            </div>
+            
+        </div>
+        <div class="sidebar__profile">
+            <div class="sidebar__profileInfo">
+                <h3>You</h3>
+                <p>#1234</p>
+            </div>
+            <div class="sidebar__profileIcons">
+            <i class="fas fa-cog sidebar__viewSettings"></i>
+            </div>
+        </div>
+        </div>
+
+        <div class="chat">
+        <div>
+            <div class="chatHeader">
+            <div class="chatHeader__left">
+                <div class="sync">
+                    <i class="fas fa-sync fa-lg search__makeSearch"></i>
+                </div>
+            </div>
+            <div class="chatHeader__right">
+                <div class="search" style="display: none;">
+                <input class="searchTerm" type="text" placeholder="search messages" />
+                <i class="fas fa-search fa-lg search__makeSearch"></i>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="chat__messages">
+            <div class="messages">
+            <div class="message" style="display:none">
+                <div class="message__info">
+                    <h4>Dummy <span class="message__timestamp">04/28/2022</span></h4>
+                    <p>Hello</p>
+                </div>
+            </div>
+            </div>
+            <div class="messageContent">
+                <textarea class="messageContent__sender"></textarea>
+                <div class="messageContent__title">
+                </div>
+                <div class="messageContent__content">
+                </div>
+                <div class="messageContentAction">
+                    <div class="contentAction__left">
+                        <div class="backToMessage">
+                            <div class="backToMessage__back">
+                                    <h4>Back</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contentAction__right">
+                    </div>
+                </div>
+            </div>
+
+            <form class="messageForm">
+                <textarea class="messagePKInput" type="text" placeholder="Send to..."></textarea>
+                <textarea class="messageTitleInput" type="text" placeholder="Title"></textarea>
+                <textarea class="messageContentInput" type="text" placeholder="Content"></textarea>
+                    <div class="messageAction">
+                        <div class="messageAction__left">
+                            <div class="cancelMessage">
+                                <div class="cancelMessage__cancel">
+                                        <h4>Cancel</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="messageAction__right">
+                            <div class="sendMessage">
+                                <div class="sendMessage__send">
+                                        <h4>Send Message</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </form>
+
+            <div class="userSetting">
+                <form class="settingsForm">
+                    <h3>Your Public Key</h3>
+                    <textarea class="userPuKInput" type="text" placeholder="Public Key"></textarea>
+                    <h3>Your Private Key</h3>
+                    <textarea class="userPrKInput" type="text" placeholder="Private Key"></textarea>
+                    <div class="settingsAction">
+                        <div class="settingsAction__left">
+                            <div class="cancelAction">
+                                <div class="cancelAction__cancel">
+                                        <h4>Cancel</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settingsAction__right">
+                            <div class="confirmAction" style="display:none">
+                                <div class="confirmAction__confirm">
+                                        <h4>Confirm change</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="addContactSetting">
+                <form class="addContactSettingForm">
+                    <h3>New Contact</h3>
+                    <textarea class="newContactPuKInput" type="text" placeholder="Public Key"></textarea>
+                    <div class="addContactAction">
+                        <div class="addContactAction__left">
+                            <div class="cancelAddContact">
+                                <div class="cancelAddContact__cancel">
+                                        <h4>Cancel</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="addContact__right">
+                            <div class="addContact">
+                                <div class="addContact__confirm">
+                                        <h4>Add</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+
+        <div class="chat__input" style="display: none;">
+            
+        </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
