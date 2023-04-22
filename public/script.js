@@ -37,7 +37,9 @@ const viewUserSetting = document.querySelector(".userSetting");
 const viewMessageContent =  document.querySelector(".messageContent");
 
 
-
+/* 
+    Functions
+*/
 // Synchronises with the latest messages and contacts
 function sync() {
   clearDisplay();
@@ -248,6 +250,11 @@ function clearDisplay() {
 }
 
 sync();
+
+
+/* 
+    Event-listener
+*/
 
 openAddContact.addEventListener("click", ()  => {
     clearDisplay();
