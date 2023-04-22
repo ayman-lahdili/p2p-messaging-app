@@ -33,6 +33,7 @@ function sync() {
     showProfile();
     showContacts();
     showMessages();
+    fetch("/peers");
 }
 
 
@@ -337,7 +338,7 @@ sendMessage.addEventListener("click", ()  => {
     })
     .then(response => {
         if (response.ok) {
-        console.log('Data added successfully!');
+        console.log('Message sent successfully!');
         } else {
         console.error('Failed to add data:', response.status, response.statusText);
         }
