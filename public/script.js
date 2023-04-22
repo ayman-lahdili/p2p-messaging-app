@@ -1,26 +1,34 @@
-const addContact = document.querySelector(".addContact");
+/* 
+    DOM Elements
+*/
+
+// Contact
+const saveContact = document.querySelector(".addContact");
 const cancelAddContact = document.querySelector(".cancelAddContact");
 const contactDisplay = document.querySelector(".contacts");
 const contacts = JSON.parse(localStorage.getItem("contacts")) || [];
-
-const addUser = document.querySelector(".sidebar__addUser");
-const deleteUser = document.querySelector(".sidebar__deleteUser");
+const openAddContact = document.querySelector(".sidebar__addUser");
 const profileInfo = document.querySelector(".sidebar__profileInfo");
-// const sendMessageUser = document.querySelector(".sidebar__user");
 
+// Messages
 const sendMessage = document.querySelector(".sendMessage");
 const cancelMessage = document.querySelector(".cancelMessage");
 
+// Settings
 const changeSettings = document.querySelector(".sidebar__viewSettings");
 const confirmSettingsAction = document.querySelector(".confirmAction");
 const cancelAction = document.querySelector(".cancelAction");
 
+// Back
 const backToMessage = document.querySelector(".backToMessage");
 
+// Search: FUNCTIONALITY TO ADD
 const search = document.querySelector(".search");
 
+// Synchronise 
 const syncMessages = document.querySelector(".sync");
 
+// Display Areas
 const viewMessages = document.querySelector(".messages");
 const viewMessage = document.querySelector(".message");
 const viewContactForm = document.querySelector(".addContactSetting");
@@ -28,51 +36,51 @@ const viewMessageForm = document.querySelector(".messageForm");
 const viewUserSetting = document.querySelector(".userSetting");
 const viewMessageContent =  document.querySelector(".messageContent");
 
+
+
+// Synchronises with the latest messages and contacts
 function sync() {
-    clearDisplay();
-    showProfile();
-    showContacts();
-    showMessages();
-    fetch("/peers");
+  clearDisplay();
+  showProfile();
+  showContacts();
+  showMessages();
+  fetch("/peers");
 }
 
-
+// Generates a Public Key and Private Key PEM format for to user in his localStorage 
 function getKeyPair() {
-    // generer et sauvegarder la clef privee en format PEM dans localStorage
-    // si elle n'y est pas encore...
     var keyPair, pem = localStorage.getItem("userPrivateKey");
     if (pem) {
-      console.log("USING MY KEY")
-      var privateKey = forge.pki.privateKeyFromPem(pem);
-      var publicKey = forge.pki.setRsaPublicKey(privateKey.n, privateKey.e);
-      keyPair = {privateKey, publicKey};
+        var privateKey = forge.pki.privateKeyFromPem(pem);
+        var publicKey = forge.pki.setRsaPublicKey(privateKey.n, privateKey.e);
+        
+        keyPair = {privateKey, publicKey};
     } else {
-      console.log("CREATING NEW KEY")
-      keyPair = forge.pki.rsa.generateKeyPair({bits: 1024});
-      console.log(keyPair.publicKey);
-      localStorage.setItem("userPrivateKey",forge.pki.privateKeyToPem(keyPair.privateKey));
-      localStorage.setItem("userPublicKey", forge.pki.publicKeyToPem(forge.pki.setRsaPublicKey(keyPair.privateKey.n, keyPair.privateKey.e)));
+        keyPair = forge.pki.rsa.generateKeyPair({bits: 1024});
+
+        localStorage.setItem("userPrivateKey",forge.pki.privateKeyToPem(keyPair.privateKey));
+        localStorage.setItem("userPublicKey", forge.pki.publicKeyToPem(forge.pki.setRsaPublicKey(keyPair.privateKey.n, keyPair.privateKey.e)));
     };
     return keyPair;
 };
 
 const keyPair = getKeyPair();
-
 const USERPUBLICKEY = keyPair.publicKey;
 const USERPRIVATEKEY = keyPair.privateKey;
+// Truncated Public Key, used to identify the user in a concise way
 const TRUNCUSERPUBLICKEY = localStorage.getItem("userPublicKey").trim().replace(/\r?\n|\r/g, '').substring(66, 76);
 
 // Function to encrypt a message with a recipient's public key
 function encryptMessage(message, receiverPublicKey) {
     // Convert the message to a Uint8Array
     const originalBytes = forge.util.createBuffer(message, 'utf8');
-  
+
     // Generate a random 128-bit AES key
     const aesKey = forge.random.getBytesSync(16);
-  
+
     // Convert the AES key to a Base64-encoded string
     const aesKeyBase64 = forge.util.encode64(aesKey);
-  
+
     // Encrypt the message with AES using the AES key
     const cipher = forge.cipher.createCipher('AES-CBC', aesKey);
     const iv = forge.random.getBytesSync(16);
@@ -80,58 +88,57 @@ function encryptMessage(message, receiverPublicKey) {
     cipher.update(originalBytes);
     cipher.finish();
     const encryptedBytes = cipher.output.getBytes();
-  
+
     // Convert the IV and encrypted bytes to Base64-encoded strings
     const ivBase64 = forge.util.encode64(iv);
     const encryptedBytesBase64 = forge.util.encode64(encryptedBytes);
-  
+
     // Encrypt the AES key with the recipient's public key
     const encryptedAesKey = receiverPublicKey.encrypt(aesKey);
-  
+
     // Convert the encrypted AES key to Base64-encoded string
     const encryptedAesKeyBase64 = forge.util.encode64(encryptedAesKey);
-  
+
     // Return the encrypted message, IV, and encrypted AES key as an object
     return {
-      content: encryptedBytesBase64,
-      iv: ivBase64,
-      aesKey: encryptedAesKeyBase64
+        content: encryptedBytesBase64,
+        iv: ivBase64,
+        aesKey: encryptedAesKeyBase64
     };
 };
   
-  // Function to decrypt an encrypted message with a user's private key
-  function decryptMessage(encryptedMessage, userPrivateKey) {
+// Function to decrypt an encrypted message with a user's private key
+function decryptMessage(encryptedMessage, userPrivateKey) {
     // Decode the Base64-encoded strings from the encrypted message
     const ivDecoded = forge.util.decode64(encryptedMessage.iv);
     const encryptedBytesDecoded = forge.util.decode64(encryptedMessage.content);
     const encryptedAesKeyDecoded = forge.util.decode64(encryptedMessage.aesKey);
-  
+
     // Decrypt the AES key with the user's private key
     const decryptedAesKey = userPrivateKey.decrypt(encryptedAesKeyDecoded);
-  
+
     // Decrypt the encrypted bytes with the decrypted AES key and IV
     const decipher = forge.cipher.createDecipher('AES-CBC', decryptedAesKey);
     decipher.start({ iv: ivDecoded });
     decipher.update(forge.util.createBuffer(encryptedBytesDecoded));
     decipher.finish();
     const decryptedBytes = decipher.output.getBytes();
-  
+
     // Convert the decrypted bytes to a string
     const decryptedString = decryptedBytes.toString('utf8');
-  
+
     // Return the decrypted message
     return decryptedString;
 };
 
 function showProfile() {
-    profileInfo.innerHTML = `
-    <h3>You</h3>
-    <p>${TRUNCUSERPUBLICKEY}</p>
-    `;
+  profileInfo.innerHTML = `
+  <h3>You</h3>
+  <p>${TRUNCUSERPUBLICKEY}</p>
+  `;
 }
 
 function showContacts() {
-
     contactDisplay.innerHTML = "";
 
     contacts.forEach((contact) => {
@@ -141,14 +148,14 @@ function showContacts() {
         // Set the content of the div to the message content
         contactDiv.innerHTML = `
         <div class="contact">
-        <div id="${contact.truncPublicKey}" class="sidebar__user">
-            <div>
-            <span class="status"></span>
+            <div id="${contact.truncPublicKey}" class="sidebar__user">
+                <div>
+                <span class="status"></span>
+                </div>
+                <h4>${contact.truncPublicKey}</h4>
+                <div id="${contact.truncPublicKey}" style="display:none">${contact.publicKey}</div>
             </div>
-            <h4>${contact.truncPublicKey}</h4>
-            <div id="${contact.truncPublicKey}" style="display:none">${contact.publicKey}</div>
-        </div>
-        <i id="deleteUser-${contact.truncPublicKey}" class="fas fa-trash-alt sidebar__deleteUser"></i>
+            <i id="deleteUser-${contact.truncPublicKey}" class="fas fa-trash-alt sidebar__deleteUser"></i>
         </div>
         `
         contactDisplay.appendChild(contactDiv);
@@ -164,9 +171,8 @@ function showContacts() {
         });
 
         deleteContact.addEventListener("click", ()  => {
-
             let itarget = 0;
-            
+    
             for (let i; i<contacts.length; i++) {
                 if (contacts[i].publicKey === contact.publicKey) {
                     itarget = i;
@@ -243,16 +249,12 @@ function clearDisplay() {
 
 sync();
 
-viewMessages.style.display = "block";
-
-addUser.addEventListener("click", ()  => {
-    // alert("addUser");
+openAddContact.addEventListener("click", ()  => {
     clearDisplay();
     viewContactForm.style.display = "block";
-    
 });
 
-addContact.addEventListener("click", ()  => {
+saveContact.addEventListener("click", ()  => {
     clearDisplay();
     viewMessages.style.display = "block";
 
@@ -266,7 +268,6 @@ addContact.addEventListener("click", ()  => {
 
     contacts.push(json);
     localStorage.setItem("contacts", JSON.stringify(contacts));
-    console.log(unique);
     sync();
 });
 
@@ -275,10 +276,6 @@ cancelAddContact.addEventListener("click", ()  => {
     clearDisplay();
     viewMessages.style.display = "block";
 
-});
-
-deleteUser.addEventListener("click", ()  => {
-    alert("deleteUser");
 });
 
 changeSettings.addEventListener("click", ()  => {
@@ -389,5 +386,3 @@ cancelAction.addEventListener("click", ()  => {
     clearDisplay();
     viewMessages.style.display = "block";
 });
-
-
